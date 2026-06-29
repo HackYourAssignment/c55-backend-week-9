@@ -1,54 +1,17 @@
-# HYF Shop
+# Backend Track – Week 9 Assignment: HYF Shop
 
-A simple Spring Boot REST API built as an **assignment** for Week 9 of the Backend Track.
+Full instructions for the assignment can be found in the learning platform: https://hub.hackyourfuture.nl/Assignment-2af50f64ffc981198ffaf8de44c439b2
 
-## 🚀 Getting Started
+## Implementation Instructions
 
-### Prerequisites
+### Task 1: Project Setup
 
-- Java 25+
-- Maven
-- A running PostgreSQL instance
+Set up the project by following the instructions in the learning platform. Run `database.sql` against your PostgreSQL database and configure your environment variables in `src/main/resources/application.yaml`.
 
-### Database Setup
+### Task 2: JSONB Queries
 
-Run the provided `database.sql` file against your PostgreSQL database:
+Write your SQL and Java code to implement the missing JSONB functionality in `src/main/java/net/hackyourfuture/hyfshop/product/ProductRepository.java`.
 
-```bash
-psql -U <your_user> -d <your_database> -f database.sql
-```
+### Task 3: Image Upload
 
-This creates the `products` table, adds a GIN index on the `details` JSONB column, and inserts **115 sample products** across 7 categories.
-
-### Configuration
-
-Set the following environment variables before running:
-
-| Variable | Description |
-| --- | --- |
-| `DB_URL` | JDBC URL (e.g. `jdbc:postgresql://localhost:5432/hyfshop`) |
-| `DB_USERNAME` | PostgreSQL username |
-| `DB_PASSWORD` | PostgreSQL password |
-
-### Running
-
-```bash
-./mvnw spring-boot:run
-```
-
-The server starts on **port 8080**.
-
-## 📡 API Endpoints
-
-| Method | Endpoint | Description |
-| --- | --- | --- |
-| `GET` | `/products` | List all products |
-| `GET` | `/products/search?color=<color>` | Filter products by color |
-| `PUT` | `/products/{id}/size` | Set the size of a product |
-| `PUT` | `/products/{id}/image` | Upload a product image |
-| `DELETE` | `/products/{id}/image` | Remove a product image |
-
-## 🛠️ Tech Stack
-
-- **Java 25** · **Spring Boot 4.1.0** (Web MVC, JDBC)
-- **PostgreSQL** (via `JdbcClient`) · **Lombok**
+Create a `FileService` class and complete the image upload and delete implementation in `src/main/java/net/hackyourfuture/hyfshop/product/ProductService.java`.
