@@ -8,7 +8,7 @@ import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
 
 import java.util.List;
-import java.util.Map;
+
 
 @Repository
 @AllArgsConstructor
@@ -27,7 +27,7 @@ public class ProductRepository {
             String json = rs.getString("details");
             if (json != null) {
                 product.setDetails(objectMapper.readValue(json,
-                        new TypeReference<Map<String, Object>>() {
+                        new TypeReference<>() {
                         }));
             }
         } catch (Exception e) {
@@ -81,8 +81,8 @@ public class ProductRepository {
                 .list();
     }
 
-    public Product setSize(int id, String size) {
-        return jdbcClient.sql("""
+    public void setSize(int id, String size) {
+        jdbcClient.sql("""
                         UPDATE products
                         SET details = jsonb_set(details, '{size}', to_jsonb(CAST(? AS text)))
                         WHERE id = ?
