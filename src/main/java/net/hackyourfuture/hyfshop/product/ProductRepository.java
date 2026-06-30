@@ -4,35 +4,55 @@ import lombok.AllArgsConstructor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.ObjectMapper;
+
 import java.util.List;
+
 
 @Repository
 @AllArgsConstructor
 public class ProductRepository {
     private final JdbcClient jdbcClient;
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     public static final RowMapper<Product> PRODUCT_ROW_MAPPER = (rs, _) -> {
-        var product = new Product();
+        Product product = new Product();
         product.setId(rs.getInt("id"));
         product.setTitle(rs.getString("title"));
         product.setPrice(rs.getBigDecimal("price"));
         product.setCategory(rs.getString("category"));
         product.setImageUrl(rs.getString("image_url"));
+        try {
+            String json = rs.getString("details");
+            if (json != null) {
+                product.setDetails(objectMapper.readValue(json,
+                        new TypeReference<>() {
+                        }));
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+
+        }
+
         return product;
     };
 
     public List<Product> getAllProducts() {
         return jdbcClient
-                .sql("SELECT id, title, price, category, image_url FROM products")
+                .sql("SELECT id, title, price, category, image_url, details FROM products")
                 .query(PRODUCT_ROW_MAPPER)
                 .list();
 
     }
 
     public Product findById(int id) {
-        return jdbcClient
-                .sql("SELECT id, title, price, category, image_url FROM products WHERE id = :id")
-                .param("id", id)
+        return jdbcClient.sql("""
+                        SELECT id, title, price, category, image_url, details
+                        FROM products
+                        WHERE id = ?
+                        """)
+                .param(id)
                 .query(PRODUCT_ROW_MAPPER)
                 .single();
     }
@@ -49,12 +69,28 @@ public class ProductRepository {
     }
 
     public List<Product> findByColor(String color) {
-        // TODO: Implement
-        throw new UnsupportedOperationException("Not implemented yet");
+        return jdbcClient.sql("""
+                        SELECT *
+                        FROM products
+                        WHERE details->>'color' = ?
+                           OR jsonb_exists(details->'colors', ?)
+                        """)
+                .param(color)
+                .param(color)
+                .query(PRODUCT_ROW_MAPPER)
+                .list();
     }
 
-    public Product setSize(int id, String size) {
-        // TODO: Implement
-        throw new UnsupportedOperationException("Not implemented yet");
+    public void setSize(int id, String size) {
+        jdbcClient.sql("""
+                        UPDATE products
+                        SET details = jsonb_set(details, '{size}', to_jsonb(CAST(? AS text)))
+                        WHERE id = ?
+                        RETURNING *
+                        """)
+                .param(size)
+                .param(id)
+                .query(PRODUCT_ROW_MAPPER)
+                .single();
     }
 }

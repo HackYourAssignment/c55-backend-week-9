@@ -2,8 +2,17 @@ spring:
   application:
     name: hyf_shop
   datasource:
-    url: '${DB_URL}'
-    username: '${DB_USERNAME}'
-    password: '${DB_PASSWORD}'
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/hyfshop}
+    username: ${DB_USERNAME:hyfuser}
+    password: ${DB_PASSWORD:hyfpassword}
+
 server:
-  port: '8080'
+  port: ${SERVER_PORT:8080}
+
+b2:
+  endpoint: ${B2_ENDPOINT:https://s3.us-east-005.backblazeb2.com}
+  region: ${B2_REGION:us-east-005}
+  access-key: ${B2_ACCESS_KEY}
+  secret-key: ${B2_SECRET_KEY}
+  bucket: ${B2_BUCKET:hyfshop-product-images-dev}
+  public-url: https://f005.backblazeb2.com/file/hyfshop-product-images-dev

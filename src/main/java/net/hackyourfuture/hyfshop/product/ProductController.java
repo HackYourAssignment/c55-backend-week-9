@@ -1,6 +1,5 @@
 package net.hackyourfuture.hyfshop.product;
 
-import jakarta.annotation.Nullable;
 import lombok.AllArgsConstructor;
 import net.hackyourfuture.hyfshop.product.dto.ProductResponse;
 import net.hackyourfuture.hyfshop.product.dto.SetSizeRequest;
@@ -21,20 +20,21 @@ public class ProductController {
     }
 
     @GetMapping("/search")
-    public List<ProductResponse> searchProducts(@Nullable @RequestParam("color") String color) {
-        if (color == null) {
+    public List<ProductResponse> searchProducts(@RequestParam(value = "color", required = false) String color) {
+        if (color == null || color.isBlank()) {
             return productService.getAllProducts();
         }
+
         return productService.searchProducts(color);
     }
 
     @PutMapping("/{id}/size")
-    public ProductResponse setProductSize(@PathVariable int id, @RequestBody SetSizeRequest request) {
+    public ProductResponse setSize(@PathVariable int id, @RequestBody SetSizeRequest request) {
         return productService.setProductSize(id, request.size());
     }
 
     @PutMapping("/{id}/image")
-    public ProductResponse setProductImage(@PathVariable int id, @RequestBody MultipartFile file) {
+    public ProductResponse setProductImage(@PathVariable int id, @RequestParam("file") MultipartFile file) {
         return productService.setProductImage(id, file);
     }
 
