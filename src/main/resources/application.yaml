@@ -2,8 +2,20 @@ spring:
   application:
     name: hyf_shop
   datasource:
-    url: '${DB_URL}'
-    username: '${DB_USERNAME}'
-    password: '${DB_PASSWORD}'
+    url: jdbc:postgresql://localhost:5432/hyfshop
+    username: hyfuser
+    password: hyfpassword
+
+  sql:
+    init:
+      # runs schema.sql automatically every time the app starts
+      mode: always
 server:
   port: '8080'
+
+b2:
+  endpoint: https://s3.us-west-004.backblazeb2.com
+  region: us-west-004
+  access-key: 00442addacce4470000000001
+  secret-key: K0041aviPMRbDAPs/zOk+z610DQxfp0
+  bucket: restapitest
