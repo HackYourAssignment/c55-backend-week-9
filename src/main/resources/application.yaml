@@ -3,8 +3,8 @@ spring:
     name: hyf_shop
   datasource:
     url: jdbc:postgresql://localhost:5432/hyfshop
-    username: hyfuser
-    password: hyfpassword
+    username: YOUR_USER_NAME
+    password: YOUR_PASSWORD
 
   sql:
     init:
@@ -16,6 +16,6 @@ server:
 b2:
   endpoint: https://s3.us-west-004.backblazeb2.com
   region: us-west-004
-  access-key: 00442addacce4470000000001
-  secret-key: K0041aviPMRbDAPs/zOk+z610DQxfp0
-  bucket: restapitest
+  access-key: YOUR_KEY_ID
+  secret-key: YOUR_APPLICATION_KEY
+  bucket: YOUR_BUCKET_NAME
