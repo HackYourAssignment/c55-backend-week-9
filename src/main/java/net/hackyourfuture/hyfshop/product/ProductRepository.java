@@ -1,6 +1,7 @@
 package net.hackyourfuture.hyfshop.product;
 
 import lombok.AllArgsConstructor;
+import net.hackyourfuture.hyfshop.product.dto.ProductResponse;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
@@ -45,7 +46,7 @@ public class ProductRepository {
 
     public Product findById(int id) {
         return jdbcClient
-                .sql("SELECT id, title, price, category, image_url FROM products WHERE id = :id")
+                .sql("SELECT * FROM products WHERE id = :id")
                 .param("id", id)
                 .query(PRODUCT_ROW_MAPPER)
                 .single();
@@ -70,8 +71,11 @@ public class ProductRepository {
                 .list();
     }
 
-    public Product setSize(int id, String size) {
-        // TODO: Implement
-        throw new UnsupportedOperationException("Not implemented yet");
+    public void setSize(int id, String size) {
+        jdbcClient.
+                sql("UPDATE products SET details = jsonb_set(details, '{size}', ?::jsonb) WHERE id = ?")
+                .param("\"" + size + "\"")
+                .param(id)
+                .update();
     }
 }
