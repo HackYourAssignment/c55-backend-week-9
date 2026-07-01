@@ -20,8 +20,13 @@ public class ProductController {
         return productService.getAllProducts();
     }
 
-    @GetMapping("/search")
-    public List<ProductResponse> searchProducts(@Nullable @RequestParam("color") String color) {
+    @GetMapping("/{id}")
+    public ProductResponse getProductById(@PathVariable int id){
+        return productService.getProductById(id);
+    }
+
+    @GetMapping(params = "color")
+    public List<ProductResponse> searchProducts(@Nullable @RequestParam String color) {
         if (color == null) {
             return productService.getAllProducts();
         }
@@ -34,12 +39,13 @@ public class ProductController {
     }
 
     @PutMapping("/{id}/image")
-    public ProductResponse setProductImage(@PathVariable int id, @RequestBody MultipartFile file) {
+    public ProductResponse setProductImage(@PathVariable int id, @RequestParam("file") MultipartFile file) throws Exception {
         return productService.setProductImage(id, file);
     }
 
     @DeleteMapping("/{id}/image")
     public ProductResponse deleteProductImage(@PathVariable int id) {
+
         return productService.deleteProductImage(id);
     }
 }
