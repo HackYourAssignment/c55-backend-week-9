@@ -1,6 +1,7 @@
 package net.hackyourfuture.hyfshop.product;
 
 import lombok.RequiredArgsConstructor;
+import net.hackyourfuture.hyfshop.file.FileService;
 import net.hackyourfuture.hyfshop.product.dto.ProductResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -11,6 +12,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ProductService {
     private final ProductRepository productRepository;
+    private final FileService fileService;
 
     public List<ProductResponse> getAllProducts() {
         return productRepository.getAllProducts().stream().map(ProductResponse::from).toList();
@@ -26,14 +28,32 @@ public class ProductService {
     }
 
     public ProductResponse setProductImage(int id, MultipartFile file) {
-        // TODO: Implement
-        // call ProductRepository.setImageUrl() afterwards with the new URL
-        throw new UnsupportedOperationException("Not implemented yet");
+        try {
+            Product product = productRepository.findById(id);
+            if (product.getImageUrl() != null) {
+                fileService.deleteByUrl(product.getImageUrl());
+            }
+            String imageUrl = fileService.upload(file);
+            productRepository.setImageUrl(id, imageUrl);
+
+            Product updatedProduct = productRepository.findById(id);
+            return ProductResponse.from(updatedProduct);
+
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to upload product image", e);
+        }
     }
 
     public ProductResponse deleteProductImage(int id) {
-        // TODO: Implement
-        // call ProductRepository.setImageUrl() to set the image url to null
-        throw new UnsupportedOperationException("Not implemented yet");
+        Product product = productRepository.findById(id);
+
+        if (product.getImageUrl() != null) {
+            fileService.deleteByUrl(product.getImageUrl());
+        }
+
+        productRepository.setImageUrl(id, null);
+
+        Product updatedProduct = productRepository.findById(id);
+        return ProductResponse.from(updatedProduct);
     }
 }

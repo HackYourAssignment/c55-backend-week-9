@@ -8,9 +8,7 @@ import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
-import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
 
-import java.time.Duration;
 import java.util.UUID;
 
 @Service
@@ -22,38 +20,43 @@ public class FileService {
     @Value("${b2.bucket}")
     private String bucket;
 
+    @Value("${b2.endpoint}")
+    private String endpoint;
+
     public FileService(S3Client s3Client, S3Presigner s3Presigner) {
         this.s3Client = s3Client;
         this.s3Presigner = s3Presigner;
     }
 
-    // Upload — returns the key to save in your database
+
     public String upload(MultipartFile file) throws Exception {
-        String key = "uploads/" + UUID.randomUUID() + "-" + file.getOriginalFilename();
+        String key = UUID.randomUUID().toString() + "-" + file.getOriginalFilename();
+
         s3Client.putObject(
                 PutObjectRequest.builder()
-                        .bucket(bucket).key(key)
-                        .contentType(file.getContentType()).build(),
+                        .bucket(bucket)
+                        .key(key)
+                        .contentType(file.getContentType())
+                        .build(),
                 RequestBody.fromInputStream(file.getInputStream(), file.getSize())
         );
-        return key;
+
+        return endpoint + "/file/" + bucket + "/" + key;
     }
 
-    // Presigned URL — expires after given minutes
-    public String getLink(String key, int minutes) {
-        return s3Presigner.presignGetObject(
-                GetObjectPresignRequest.builder()
-                        .signatureDuration(Duration.ofMinutes(minutes))
-                        .getObjectRequest(r -> r.bucket(bucket).key(key))
-                        .build()
-        ).url().toString();
-    }
 
-    // Delete
-    public void delete(String key) {
+    public void deleteByUrl(String imageUrl) {
+        if (imageUrl == null || imageUrl.isEmpty()) {
+            return;
+        }
+
+        String key = imageUrl.substring(imageUrl.lastIndexOf("/") + 1);
+
         s3Client.deleteObject(
                 DeleteObjectRequest.builder()
-                        .bucket(bucket).key(key).build()
+                        .bucket(bucket)
+                        .key(key)
+                        .build()
         );
     }
 }
