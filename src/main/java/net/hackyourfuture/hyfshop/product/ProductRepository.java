@@ -65,8 +65,15 @@ public class ProductRepository {
     }
 
     public List<Product> findByColor(String color) {
-        // TODO: Implement
-        throw new UnsupportedOperationException("Not implemented yet");
+        return jdbcClient.sql("""
+                SELECT * FROM products
+                WHERE details->>'color' = :color
+                OR details ->'colors' @> :colorJson::jsonb
+                """)
+                .param("color", color)
+                .param("colorJson", "\"" + color + "\"")
+                .query(PRODUCT_ROW_MAPPER)
+                .list();
     }
 
     public Product setSize(int id, String size) {
