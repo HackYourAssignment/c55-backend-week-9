@@ -7,3 +7,14 @@ spring:
     password: '${DB_PASSWORD}'
 server:
   port: '8080'
+sql:
+  init:
+    # runs schema.sql automatically every time the app starts
+    mode: always
+
+b2:
+  endpoint: https://s3.eu-central-003.backblazeb2.com
+  region: eu-central-003
+  access-key: B2_ACCESS_KEY
+  secret-key: B2_SECRET_KEY
+  bucket: hyfshop
