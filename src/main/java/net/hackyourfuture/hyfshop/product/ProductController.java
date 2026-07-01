@@ -39,12 +39,13 @@ public class ProductController {
     }
 
     @PutMapping("/{id}/image")
-    public ProductResponse setProductImage(@PathVariable int id, @RequestBody MultipartFile file) {
+    public ProductResponse setProductImage(@PathVariable int id, @RequestParam("file") MultipartFile file) throws Exception {
         return productService.setProductImage(id, file);
     }
 
     @DeleteMapping("/{id}/image")
     public ProductResponse deleteProductImage(@PathVariable int id) {
+
         return productService.deleteProductImage(id);
     }
 }

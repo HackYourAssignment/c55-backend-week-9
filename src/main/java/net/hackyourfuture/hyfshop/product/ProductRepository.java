@@ -54,15 +54,17 @@ public class ProductRepository {
                 .single();
     }
 
-    public void setImageUrl(int id, String imageUrl) {
-        jdbcClient.sql("""
+    public Product setImageUrl(int id, String imageUrl) {
+        return jdbcClient.sql("""
                         UPDATE products
                         SET image_url = :imageUrl
                         WHERE id = :id
+                        RETURNING *
                         """)
-                .param("id", id)
                 .param("imageUrl", imageUrl)
-                .update();
+                .param("id", id)
+                .query(PRODUCT_ROW_MAPPER)
+                .single();
     }
 
     public List<Product> findByColor(String color) {
