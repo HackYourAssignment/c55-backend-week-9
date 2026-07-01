@@ -3,6 +3,7 @@ package net.hackyourfuture.hyfshop.product;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
+import net.hackyourfuture.hyfshop.product.dto.ProductResponse;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
@@ -39,7 +40,7 @@ public class ProductRepository {
 
     public List<Product> getAllProducts() {
         return jdbcClient
-                .sql("SELECT * FROM products")
+                .sql("SELECT * FROM products ORDER BY id")
                 .query(PRODUCT_ROW_MAPPER)
                 .list();
 
@@ -47,7 +48,7 @@ public class ProductRepository {
 
     public Product findById(int id) {
         return jdbcClient
-                .sql("SELECT id, title, price, category, image_url FROM products WHERE id = :id")
+                .sql("SELECT * FROM products WHERE id = :id")
                 .param("id", id)
                 .query(PRODUCT_ROW_MAPPER)
                 .single();
@@ -69,6 +70,7 @@ public class ProductRepository {
                 SELECT * FROM products
                 WHERE details->>'color' = :color
                 OR details ->'colors' @> :colorJson::jsonb
+                ORDER BY id
                 """)
                 .param("color", color)
                 .param("colorJson", "\"" + color + "\"")
@@ -77,7 +79,15 @@ public class ProductRepository {
     }
 
     public Product setSize(int id, String size) {
-        // TODO: Implement
-        throw new UnsupportedOperationException("Not implemented yet");
+        return jdbcClient.sql("""
+                UPDATE products
+                SET details = jsonb_set(details, '{size}', :size::jsonb)
+                WHERE id = :id
+                RETURNING *
+                """)
+                .param("size", "\"" + size + "\"")
+                .param("id", id)
+                .query(PRODUCT_ROW_MAPPER)
+                .single();
     }
 }

@@ -20,9 +20,12 @@ public class ProductService {
         return productRepository.findByColor(color).stream().map(ProductResponse::from).toList();
     }
 
-    public ProductResponse setProductSize(int id, String size) {
-        productRepository.setSize(id, size);
+    public ProductResponse getProductById(int id) {
         return ProductResponse.from(productRepository.findById(id));
+    }
+
+    public ProductResponse setProductSize(int id, String size) {
+        return ProductResponse.from(productRepository.setSize(id, size));
     }
 
     public ProductResponse setProductImage(int id, MultipartFile file) {

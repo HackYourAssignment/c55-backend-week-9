@@ -20,6 +20,11 @@ public class ProductController {
         return productService.getAllProducts();
     }
 
+    @GetMapping("/{id}")
+    public ProductResponse getProductById(@PathVariable int id){
+        return productService.getProductById(id);
+    }
+
     @GetMapping(params = "color")
     public List<ProductResponse> searchProducts(@Nullable @RequestParam String color) {
         if (color == null) {
