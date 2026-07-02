@@ -11,6 +11,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ProductService {
     private final ProductRepository productRepository;
+    private final FileService fileService;
 
     public List<ProductResponse> getAllProducts() {
         return productRepository.getAllProducts().stream().map(ProductResponse::from).toList();
@@ -26,14 +27,18 @@ public class ProductService {
     }
 
     public ProductResponse setProductImage(int id, MultipartFile file) {
-        // TODO: Implement
-        // call ProductRepository.setImageUrl() afterwards with the new URL
-        throw new UnsupportedOperationException("Not implemented yet");
+        String imageUrl = fileService.upload(file); // Uploading the file and getting back the public URL string
+        productRepository.setImageUrl(id, imageUrl); // Save the URL to the database image_url column
+        return ProductResponse.from(productRepository.findById(id));
     }
 
     public ProductResponse deleteProductImage(int id) {
-        // TODO: Implement
-        // call ProductRepository.setImageUrl() to set the image url to null
-        throw new UnsupportedOperationException("Not implemented yet");
+        Product product = productRepository.findById(id);
+        // check if an image exists
+        if (product != null && product.getImageUrl() != null) {
+            fileService.delete(product.getImageUrl());
+        }
+        productRepository.setImageUrl(id, null); // Update the database image_url column to null
+        return ProductResponse.from(productRepository.findById(id));
     }
 }
